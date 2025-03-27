@@ -1,0 +1,51 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "resources": [
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2022-03-01",
+            "name": "MyAppServicePlan",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "F1",
+                "tier": "Free"
+            },
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2022-03-01",
+            "name": "MyMvcApp",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', 'MyAppServicePlan')]"
+            ],
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', 'MyAppServicePlan')]"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2022-02-01-preview",
+            "name": "mySqlServer",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "administratorLogin": "sqladmin",
+                "administratorLoginPassword": "P@ssw0rd123"
+            },
+            "resources": [
+                {
+                    "type": "databases",
+                    "apiVersion": "2022-02-01-preview",
+                    "name": "ContactDatabase",
+                    "properties": {
+                        "collation": "SQL_Latin1_General_CP1_CI_AS",
+                        "maxSizeBytes": 2147483648,
+                        "sampleName": "AdventureWorksLT"
+                    }
+                }
+            ]
+        }
+    ]
+}
